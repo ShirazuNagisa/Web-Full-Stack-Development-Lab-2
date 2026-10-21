@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>寻宝游戏 · 实验二</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+
+  <body>
+    <div class="stars stars-a"></div>
+    <div class="stars stars-b"></div>
+    <div class="fog fog-a"></div>
+    <div class="fog fog-b"></div>
+
+    <header class="page-head">
+      <h1>🗺️ 寻宝游戏</h1>
+      <p class="subtitle">async / await 重写 · 异步情节 · 动画演示</p>
+    </header>
+
+    <main class="stage">
+      <!-- 左侧:寻宝地图 -->
+      <section class="map-panel">
+        <div class="map" id="map">
+          <svg class="route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polyline points="10,74 24,40 42,66 58,32 74,62 89,34" vector-effect="non-scaling-stroke"/>
+          </svg>
+
+          <div class="node" data-node="library" style="--x:10%; --y:74%"><span class="icon">📚</span><span class="name">古老图书馆</span></div>
+          <div class="node" data-node="stele"    style="--x:24%; --y:40%"><span class="icon">🗿</span><span class="name">古老石碑</span></div>
+          <div class="node" data-node="ruins"    style="--x:42%; --y:66%"><span class="icon">🧩</span><span class="name">遗迹碎片</span></div>
+          <div class="node" data-node="river"    style="--x:58%; --y:32%"><span class="icon">🌊</span><span class="name">忘川之河</span></div>
+          <div class="node" data-node="temple"   style="--x:74%; --y:62%"><span class="icon">🏛️</span><span class="name">古老神庙</span></div>
+          <div class="node" data-node="chest"    style="--x:89%; --y:34%"><span class="icon">💰</span><span class="name">神秘宝箱</span></div>
+
+          <div class="guard" id="guard">👹</div>
+          <div class="explorer" id="explorer"><span class="face">🤠</span></div>
+          <div class="flash" id="flash"></div>
+        </div>
+      </section>
+
+      <!-- 右侧:冒险日志 -->
+      <section class="log-panel">
+        <div class="log-head">
+          <h2>冒险日志</h2>
+          <div class="dots" id="dots">
+            <span class="dot" data-node="library" title="古老图书馆"></span>
+            <span class="dot" data-node="stele"   title="古老石碑"></span>
+            <span class="dot" data-node="ruins"   title="遗迹碎片"></span>
+            <span class="dot" data-node="river"   title="忘川之河"></span>
+            <span class="dot" data-node="temple"  title="古老神庙"></span>
+            <span class="dot" data-node="chest"   title="神秘宝箱"></span>
+          </div>
+        </div>
+        <div class="log" id="log"></div>
+        <button id="start">启程寻宝</button>
+        <p class="hint">守卫与独木桥都会随机出状况,每次冒险都是新的剧情</p>
+      </section>
+    </main>
+
+    <!-- 结算弹层 -->
+    <div class="overlay" id="overlay">
+      <div class="overlay-card">
+        <div class="coin-layer" id="coins"></div>
+        <div class="overlay-icon" id="overlay-icon">🏆</div>
+        <h2 id="overlay-title">寻宝成功!</h2>
+        <p id="overlay-sub">失落宝藏重见天日。</p>
+        <button id="again">再来一次</button>
+      </div>
+    </div>
+
+    <script src="treasure.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,375 @@
+/* ============================================================
+   实验二 寻宝游戏 —— style.css
+   夜色寻宝地图 + 冒险日志:星空、迷雾、路线行进、
+   站点脉冲、守卫震屏、金色闪光、金币迸发、打字机光标等动画。
+   ============================================================ */
+
+* { box-sizing: border-box; }
+
+:root {
+  --gold: #f5c542;
+  --gold-soft: rgba(245, 197, 66, 0.35);
+  --line: rgba(245, 197, 66, 0.25);
+  --panel: rgba(16, 22, 48, 0.82);
+  --text: #ece9f4;
+  --muted: #9aa0c3;
+}
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 80% -10%, #232a5c 0%, transparent 60%),
+    radial-gradient(900px 500px at 10% 110%, #1c2f4a 0%, transparent 55%),
+    linear-gradient(180deg, #0b1026 0%, #131a3a 60%, #0d1228 100%);
+  overflow-x: hidden;
+}
+
+/* ---------- 夜空星星(两层交替闪烁) ---------- */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-repeat: repeat;
+  background-size: 520px 390px;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, #fff 40%, transparent 41%),
+    radial-gradient(1px 1px at 34% 68%, #ffe9a8 40%, transparent 41%),
+    radial-gradient(1.5px 1.5px at 55% 12%, #fff 40%, transparent 41%),
+    radial-gradient(1px 1px at 71% 44%, #cfe6ff 40%, transparent 41%),
+    radial-gradient(1.5px 1.5px at 86% 76%, #fff 40%, transparent 41%),
+    radial-gradient(1px 1px at 23% 88%, #ffe9a8 40%, transparent 41%),
+    radial-gradient(1px 1px at 64% 90%, #fff 40%, transparent 41%),
+    radial-gradient(1px 1px at 92% 18%, #cfe6ff 40%, transparent 41%);
+  animation: twinkle 3.2s ease-in-out infinite;
+}
+.stars-b { background-size: 700px 520px; animation-delay: 1.6s; opacity: 0.7; }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+
+/* ---------- 飘动的迷雾 ---------- */
+.fog {
+  position: fixed;
+  width: 60vw; height: 22vh;
+  border-radius: 50%;
+  filter: blur(60px);
+  background: rgba(120, 140, 220, 0.10);
+  pointer-events: none;
+}
+.fog-a { top: 12%; left: -10vw; animation: drift 26s ease-in-out infinite alternate; }
+.fog-b { bottom: 6%; right: -12vw; animation: drift 34s ease-in-out infinite alternate-reverse; }
+
+@keyframes drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(14vw); }
+}
+
+/* ---------- 标题 ---------- */
+.page-head { position: relative; z-index: 2; text-align: center; padding: 28px 16px 8px; }
+.page-head h1 {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 40px);
+  letter-spacing: 6px;
+  color: var(--gold);
+  text-shadow: 0 0 24px var(--gold-soft);
+}
+.subtitle { margin: 8px 0 0; color: var(--muted); font-size: 14px; letter-spacing: 2px; }
+
+/* ---------- 布局 ---------- */
+.stage {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+  gap: 18px;
+  max-width: 1180px;
+  margin: 18px auto 40px;
+  padding: 0 18px;
+}
+
+.map-panel, .log-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+}
+.map-panel { padding: 14px; }
+
+/* ---------- 地图 ---------- */
+.map {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 197, 66, 0.18);
+  background:
+    radial-gradient(500px 260px at 50% 0%, rgba(245, 197, 66, 0.08), transparent 70%),
+    linear-gradient(160deg, #16204a 0%, #101a3c 55%, #0c1430 100%);
+}
+
+.route { position: absolute; inset: 0; width: 100%; height: 100%; }
+.route polyline {
+  fill: none;
+  stroke: var(--gold-soft);
+  stroke-width: 2;
+  stroke-dasharray: 6 7;
+  stroke-linecap: round;
+  animation: march 1.2s linear infinite;
+}
+@keyframes march { to { stroke-dashoffset: -13; } }
+
+/* 站点 */
+.node {
+  position: absolute;
+  left: var(--x); top: var(--y);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  z-index: 3;
+  text-align: center;
+}
+.node .icon {
+  font-size: 30px;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px rgba(245, 197, 66, 0.25));
+  transition: filter 0.3s ease;
+}
+.node .name { font-size: 12px; color: var(--muted); letter-spacing: 1px; white-space: nowrap; }
+.node.active .icon { animation: pulse 1s ease-in-out infinite; }
+.node.active .name { color: var(--gold); }
+.node.shake .icon { animation: shake 0.4s ease-in-out 3; }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-4px) rotate(-6deg); }
+  75% { transform: translateX(4px) rotate(6deg); }
+}
+
+/* 探险家 */
+.explorer {
+  position: absolute;
+  left: 10%; top: 74%;
+  transform: translate(-50%, -62%);
+  font-size: 34px;
+  z-index: 5;
+  filter: drop-shadow(0 6px 8px rgba(0, 0, 0, 0.5));
+  transition: left 1.4s cubic-bezier(0.45, 0.05, 0.35, 1), top 1.4s cubic-bezier(0.45, 0.05, 0.35, 1);
+}
+.explorer .face { display: inline-block; animation: bob 0.5s ease-in-out infinite alternate; }
+
+@keyframes bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(-6px); }
+}
+
+/* 神庙守卫 */
+.guard {
+  position: absolute;
+  left: calc(74% + 30px); top: calc(62% - 34px);
+  font-size: 30px;
+  z-index: 6;
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+}
+.guard.show { opacity: 1; transform: scale(1); animation: guardPulse 0.8s ease-in-out infinite; }
+
+@keyframes guardPulse {
+  0%, 100% { transform: scale(1) rotate(-3deg); }
+  50% { transform: scale(1.15) rotate(3deg); }
+}
+
+/* 找到宝藏时的金色闪光 */
+.flash {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 89% 34%, rgba(255, 236, 170, 0.9), rgba(245, 197, 66, 0.25) 40%, transparent 70%);
+}
+.flash.go { animation: flash 1.2s ease-out forwards; }
+
+@keyframes flash {
+  0% { opacity: 0; }
+  25% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ---------- 冒险日志 ---------- */
+.log-panel { display: flex; flex-direction: column; padding: 16px; min-height: 420px; }
+.log-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.log-head h2 { margin: 0; font-size: 18px; color: var(--gold); letter-spacing: 3px; }
+
+.dots { display: flex; gap: 6px; }
+.dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+.dot.lit { background: var(--gold); box-shadow: 0 0 10px var(--gold-soft); transform: scale(1.15); }
+
+.log {
+  flex: 1;
+  min-height: 240px;
+  max-height: 46vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-right: 6px;
+  scrollbar-width: thin;
+}
+
+.entry {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.65;
+  animation: slideIn 0.35s ease both;
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.entry .tag {
+  flex: none;
+  font-size: 12px;
+  padding: 1px 8px;
+  margin-top: 2px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.entry.info .tag { color: #8fb7ff; }
+.entry.success .tag { color: #7ce38b; }
+.entry.warning .tag { color: #ffb454; }
+.entry.danger .tag { color: #ff7a7a; }
+.entry.final .tag { color: var(--gold); }
+
+.entry .text { min-height: 1em; }
+.entry.warning .text { color: #ffd9a0; }
+.entry.danger .text { color: #ffb1b1; }
+.entry.final .text { color: var(--gold); font-weight: 700; }
+
+/* 打字机光标 */
+.entry .text::after { content: "▌"; margin-left: 2px; color: var(--gold); opacity: 0; animation: caret 0.8s steps(1) infinite; }
+.entry.typing .text::after { opacity: 1; }
+@keyframes caret { 50% { opacity: 0; } }
+
+/* ---------- 按钮 ---------- */
+#start {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #20180a;
+  background: linear-gradient(135deg, #ffd76a, #f0a92e);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(240, 169, 46, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+}
+#start:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(240, 169, 46, 0.45); }
+#start:disabled { filter: grayscale(0.4) brightness(0.8); cursor: wait; }
+
+.hint { margin: 10px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+
+/* ---------- 结算弹层 ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(6, 9, 24, 0.72);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s, visibility 0.4s;
+}
+.overlay.show { opacity: 1; visibility: visible; }
+
+.overlay-card {
+  position: relative;
+  text-align: center;
+  padding: 40px 56px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: linear-gradient(160deg, rgba(30, 38, 80, 0.95), rgba(16, 22, 48, 0.95));
+  box-shadow: 0 0 60px rgba(245, 197, 66, 0.25);
+  transform: scale(0.8);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.overlay.show .overlay-card { transform: scale(1); }
+.overlay.fail .overlay-card { box-shadow: 0 0 60px rgba(255, 90, 90, 0.2); }
+
+.overlay-icon { font-size: 64px; animation: floatY 2.4s ease-in-out infinite; }
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+#overlay-title { margin: 12px 0 6px; font-size: 26px; color: var(--gold); letter-spacing: 4px; }
+.overlay.fail #overlay-title { color: #ff8a8a; }
+#overlay-sub { margin: 0 0 20px; color: var(--muted); font-size: 14px; }
+
+#again {
+  padding: 10px 26px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: #20180a;
+  background: linear-gradient(135deg, #ffd76a, #f0a92e);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+#again:hover { filter: brightness(1.08); }
+
+/* 金币迸发 */
+.coin-layer { position: absolute; inset: 0; overflow: visible; pointer-events: none; }
+.coin {
+  position: absolute;
+  bottom: 30%;
+  font-size: 22px;
+  opacity: 0;
+  animation: coinFly 1.6s ease-in forwards;
+}
+@keyframes coinFly {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0) scale(0.6); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + var(--fall))) rotate(540deg) scale(1); }
+}
+
+/* ---------- 响应式与无障碍 ---------- */
+@media (max-width: 920px) {
+  .stage { grid-template-columns: 1fr; }
+  .log-panel { min-height: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars, .fog, .route polyline, .explorer .face, .guard.show,
+  .node.active .icon, .overlay-icon, .coin, .entry { animation: none !important; }
+  .explorer { transition: none; }
+}
